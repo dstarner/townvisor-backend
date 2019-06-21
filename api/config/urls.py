@@ -25,7 +25,7 @@ def _build_includes(path):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', _build_includes('users.urls')),
-    path('', _build_includes('posts.urls')),
+    path('posts/', _build_includes('posts.urls')),
 ]
 
 if settings.DEBUG:

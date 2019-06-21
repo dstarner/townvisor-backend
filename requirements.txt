@@ -4,6 +4,8 @@ django-extensions==2.1.9
 djangorestframework==3.9.4
 djangorestframework-camel-case==1.0.3
 djangorestframework-jwt==1.11.0
+drf-nested-routers==0.91
+Pillow==6.0.0
 PyJWT==1.7.1
 pytz==2019.1
 six==1.12.0

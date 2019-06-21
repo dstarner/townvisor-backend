@@ -25,13 +25,13 @@ def get_nested_comments_router(parent_router, parent_name=''):
 
 router = routers.SimpleRouter()
 router.register('comments', views.CommentViewSet)
-router.register('posts', views.PostViewSet)
+router.register('', views.PostViewSet)
 
-comments_router = get_nested_comments_router(router)
+# comments_router = get_nested_comments_router(router)
 
 
 urlpatterns = [
     path('feed', views.FeedView.as_view()),
     path('', include(router.urls)),
-    path('', include(comments_router.urls)),
+    # path('', include(comments_router.urls)),
 ]
