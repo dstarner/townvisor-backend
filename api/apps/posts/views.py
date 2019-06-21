@@ -22,3 +22,20 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
         if self.detail:
             return serializers.PostDetailSerializer
         return serializers.PostSerializer
+
+
+class CommentViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Comment.objects.all()
+    page_size = 10
+
+    def get_queryset(self):
+        if 'post_slug' in self.kwargs:
+            return self.queryset.filter(post__slug=self.kwargs['post_slug'])
+        if 'parent_id' in self.kwargs:
+            return self.queryset.filter(parent__id=self.kwargs['parent_id'])
+        return self.queryset
+
+    def get_serializer_class(self):
+        if self.detail:
+            return serializers.CommentSerializer
+        return serializers.CommentSerializer

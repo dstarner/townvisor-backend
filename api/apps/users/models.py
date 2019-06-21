@@ -62,9 +62,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     last_name = models.CharField(max_length=255, default='')
 
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(verbose_name='Date of Birth', help_text='In YYYY-MM-DD format')
 
     about = models.TextField(default='I haven\'t filled my About section out yet!')
+
+    avatar = models.ImageField(blank=True, null=True)
+    header = models.ImageField(blank=True, null=True)
 
     # PERMISSIONS
 
@@ -86,6 +89,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'date_of_birth']
+
 
     def __str__(self):
         return self.username

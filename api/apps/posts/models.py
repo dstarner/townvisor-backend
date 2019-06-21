@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django_extensions.db.fields import (
-    AutoSlugField, CreationDateTimeField, ModificationDateTimeField
+    AutoSlugField, CreationDateTimeField, ModificationDateTimeField, RandomCharField
 )
 
 
@@ -49,4 +49,39 @@ class Post(models.Model):
         return f'{self.author.profile_url}/{self.slug}'
 
     class Meta:
+        db_table = 'posts'
         ordering = ['-created']
+
+
+class Comment(models.Model):
+
+    id = RandomCharField(primary_key=True, editable=False, length=15, unique=True)
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, related_name='replies', null=True, blank=True)
+
+    author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
+
+    content = models.TextField(default='')
+
+    created = CreationDateTimeField(verbose_name='Creation Time')
+
+    class Meta:
+        db_table = 'comments'
+        ordering = ['-created']
+
+    def __str__(self):
+        return f'Comment #{self.id}'
+
+    @property
+    def post_name(self):
+        """Get the name of the post its attached to
+        """
+        if self.post is not None:
+            return self.post.title
+        return self.parent.post_name

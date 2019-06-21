@@ -1,7 +1,30 @@
 from rest_framework import serializers
 
 from api.apps.users.serializers import UserSerializer
-from .models import Post
+from .models import Post, Comment
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    author = UserSerializer()
+
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = (
+            'id',
+            'post',
+            'parent',
+            'author',
+            'replies',
+        )
+
+    def get_replies(self, comment):
+        """Return a list of replies for this post
+        """
+        return CommentSerializer(comment.replies.all(), many=True, context={'request': self.context['request']}).data
+
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
 

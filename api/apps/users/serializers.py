@@ -3,12 +3,18 @@ from rest_framework import serializers
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+
+    avatar = serializers.ImageField(max_length=None, use_url=True)
+    header = serializers.ImageField(max_length=None, use_url=True)
+
     class Meta:
         model = get_user_model()
         lookup_field = 'username'
         fields = (
             'url',
             'about',
+            'avatar',
+            'header',
             'profile_url',
             'username',
             'email',

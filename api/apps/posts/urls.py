@@ -13,11 +13,25 @@ def get_nested_posts_router(parent_router, parent_name=''):
     posts_router.register('posts', views.PostViewSet, base_name='user-posts')
     return posts_router
 
+def get_nested_comments_router(parent_router, parent_name=''):
+    """
+    Given a parent router and its routing key, this will return a nested
+    router that will allow comments to be nested under the parent descriptive URLs
+    """
+    comments_router = routers.NestedDefaultRouter(parent_router, parent_prefix='posts', lookup='post')
+    comments_router.register('comments', views.CommentViewSet, base_name='post-comments')
+    return comments_router
+
 
 router = routers.SimpleRouter()
-router.register('', views.PostViewSet)
+router.register('comments', views.CommentViewSet)
+router.register('posts', views.PostViewSet)
+
+comments_router = get_nested_comments_router(router)
+
 
 urlpatterns = [
     path('feed', views.FeedView.as_view()),
     path('', include(router.urls)),
+    path('', include(comments_router.urls)),
 ]
