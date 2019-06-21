@@ -29,6 +29,11 @@ class Post(models.Model):
 
     last_modified = ModificationDateTimeField(verbose_name='Last Modified Time')
 
+    thumbnail = models.ImageField(null=True, blank=True)
+
+    header = models.ImageField(null=True, blank=True)
+    header_caption = models.CharField(max_length=128, default='', blank=True, null=True)
+
     md_content = models.TextField(
         default='',
         verbose_name='Markdown Content',
@@ -40,3 +45,8 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    def abs_path(self):
+        return f'{self.author.profile_url}/{self.slug}'
+
+    class Meta:
+        ordering = ['-created']

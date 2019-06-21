@@ -64,6 +64,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     date_of_birth = models.DateField()
 
+    about = models.TextField(default='I haven\'t filled my About section out yet!')
+
     # PERMISSIONS
 
     is_active = models.BooleanField(default=True, verbose_name='Active Status')
@@ -91,3 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def profile_url(self):
+        return f'/{self.username}'

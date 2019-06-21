@@ -48,7 +48,8 @@ if not DEBUG:
     X_FRAME_OPTIONS = get_env('X_FRAME_OPTIONS', 'DENY').upper()
 
 # Cors Configuration
-CORS_ORIGIN_WHITELIST = get_list('CORS_ORIGIN_WHITELIST', 'localhost:8080')
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ORIGIN_WHITELIST = get_list('CORS_ORIGIN_WHITELIST', ['http://localhost:8080', 'http://127.0.0.1:8080'])
 
 # Application definition
 APP_ROOT = 'api.apps'
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'django_extensions',           # Provides extra functionality to manage.py
     'rest_framework',              # Provides all of the REST API functionality
 
@@ -153,6 +155,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = get_path('media')
+
 
 # Application Logging
 # https://docs.djangoproject.com/en/2.2/topics/logging/
@@ -214,5 +219,5 @@ REST_FRAMEWORK = {
         'no_underscore_before_number': True,
     },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 25,
 }

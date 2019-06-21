@@ -8,12 +8,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = 'username'
         fields = (
             'url',
+            'about',
+            'profile_url',
             'username',
             'email',
             'is_staff',
             'is_mod',
             'first_name',
             'last_name',
+            'full_name',
         )
         extra_kwargs = {
             'url': {'lookup_field': 'username'}

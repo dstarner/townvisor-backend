@@ -6,6 +6,8 @@ from .models import Post
 class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     author = UserSerializer()
+    header = serializers.ImageField(max_length=None, use_url=True)
+    thumbnail = serializers.ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Post
@@ -16,6 +18,9 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             'created',
             'last_modified',
             'slug',
+            'header',
+            'thumbnail',
+            'abs_path',
         )
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
@@ -24,17 +29,14 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     author = UserSerializer()
+    header = serializers.ImageField(max_length=None, use_url=True)
+    thumbnail = serializers.ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Post
         lookup_field = 'slug'
-        fields = (
-            'url',
-            'title',
-            'author',
-            'created',
-            'last_modified',
-            'slug',
+        fields = PostSerializer.Meta.fields + (
+            'header_caption',
             'md_content',
         )
         extra_kwargs = {
