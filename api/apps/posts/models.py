@@ -4,6 +4,8 @@ from django_extensions.db.fields import (
     AutoSlugField, CreationDateTimeField, ModificationDateTimeField, RandomCharField
 )
 
+from api.config.storage_backends import PrivateMediaStorage
+
 
 class PostManager(models.Manager):
     
@@ -13,7 +15,10 @@ class PostManager(models.Manager):
 
 class Post(models.Model):
 
-    title = models.CharField(default='', max_length=128)
+    title = models.CharField(
+        default='',
+        max_length=128
+    )
 
     author = models.ForeignKey(
         get_user_model(),
@@ -21,7 +26,12 @@ class Post(models.Model):
         related_name='posts',
     )
 
-    slug = AutoSlugField(populate_from=['title'])
+    slug = AutoSlugField(
+        primary_key=True,
+        unique=True,
+        populate_from=['title'],
+        help_text='Unique UUID string that represents the post',
+    )
 
     published = models.BooleanField(default=False, help_text='Is the post published and public')
 
@@ -29,9 +39,17 @@ class Post(models.Model):
 
     last_modified = ModificationDateTimeField(verbose_name='Last Modified Time')
 
-    thumbnail = models.ImageField(null=True, blank=True)
+    thumbnail = models.ImageField(
+        storage=PrivateMediaStorage(),
+        blank=True,
+        null=True
+    )
 
-    header = models.ImageField(null=True, blank=True)
+    header = models.ImageField(
+        storage=PrivateMediaStorage(),
+        blank=True,
+        null=True
+    )
     header_caption = models.CharField(max_length=128, default='', blank=True, null=True)
 
     md_content = models.TextField(

@@ -48,6 +48,9 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
+        read_only_fields = (
+            'slug'
+        )
 
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -65,3 +68,4 @@ class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
+        read_only_fields = PostSerializer.Meta.read_only_fields

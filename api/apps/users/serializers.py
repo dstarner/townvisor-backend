@@ -4,8 +4,26 @@ from rest_framework import serializers
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 
-    avatar = serializers.ImageField(max_length=None, use_url=True)
-    header = serializers.ImageField(max_length=None, use_url=True)
+    avatar = serializers.ImageField(
+        max_length=None,
+        use_url=True,
+        required=False,
+        read_only=True,
+    )
+    header = serializers.ImageField(
+        max_length=None,
+        use_url=True,
+        required=False,
+        read_only=True,
+    )
+
+    first_name = serializers.CharField(
+        required=True,
+    )
+
+    last_name = serializers.CharField(
+        required=True,
+    )
 
     class Meta:
         model = get_user_model()
@@ -23,7 +41,24 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'first_name',
             'last_name',
             'full_name',
+            'date_of_birth',
         )
         extra_kwargs = {
             'url': {'lookup_field': 'username'}
         }
+        write_only_fields = (
+            'date_of_birth',
+        )
+        read_only_fields = (
+            'is_staff',
+            'is_mod',
+            'avatar',
+            'header',
+        )
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+    current_password = serializers.CharField(required=True, help_text='Current password for the user')
+
+    new_password = serializers.CharField(required=True, help_text='New password for the user')

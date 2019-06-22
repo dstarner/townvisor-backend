@@ -17,6 +17,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.documentation import include_docs_urls
+
+
+admin.site.site_header = 'Townvisor'
 
 
 def _build_includes(path):
@@ -24,9 +28,11 @@ def _build_includes(path):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
+    path(f'{settings.API_DOCS_NAME}/', include_docs_urls(title='Townvisor API')),
     path('users/', _build_includes('users.urls')),
     path('posts/', _build_includes('posts.urls')),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG and not settings.USE_S3_STORAGE:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

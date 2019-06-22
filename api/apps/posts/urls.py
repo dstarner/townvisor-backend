@@ -31,7 +31,7 @@ router.register('', views.PostViewSet)
 
 
 urlpatterns = [
-    path('feed', views.FeedView.as_view()),
+    path('feed/', views.FeedView.as_view()),
     path('', include(router.urls)),
     # path('', include(comments_router.urls)),
 ]

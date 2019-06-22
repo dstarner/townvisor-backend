@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import datetime
 import os
+import dj_database_url
 
 from .env import *
 
@@ -23,20 +24,23 @@ ADMINS = [
     ('Ed Rhudy', 'erhudy@bloomberg.net'),
 ]
 
+DEPLOY_ON_HEROKU = get_bool('DEPLOY_ON_HEROKU')
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_env('SECRET_KEY', '0=f(=4p68f$xr_-yo)(y&b0cv!uizr38-vk1-ju)f%6(=bmax$')
+
+APPEND_SLASH = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool('DEBUG', True)
 
-ALLOWED_HOSTS = get_list('ALLOWED_HOSTS', [])
+ALLOWED_HOSTS = get_list('ALLOWED_HOSTS', default=[])
 if not DEBUG and not ALLOWED_HOSTS:
     raise ValueError("ALLOWED_HOSTS cannot be empty when not in DEBUG")
 
 SECURE_SSL_REDIRECT = False
 
 if not DEBUG:
-    ALLOWED_HOSTS = get_list(os.getenv('ALLOWED_HOSTS', ''))
     SECURE_HSTS_SECONDS = get_int('SECURE_HSTS_SECONDS', 60)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = get_bool('SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
     SECURE_CONTENT_TYPE_NOSNIFF = get_bool('SECURE_CONTENT_TYPE_NOSNIFF', True)
@@ -54,6 +58,8 @@ CORS_ORIGIN_WHITELIST = get_list('CORS_ORIGIN_WHITELIST', ['http://localhost:808
 # Application definition
 APP_ROOT = 'api.apps'
 
+API_DOCS_NAME = 'docs'
+
 
 # Application definition
 
@@ -67,6 +73,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',           # Provides extra functionality to manage.py
     'rest_framework',              # Provides all of the REST API functionality
+    'storages',
 
     f'{APP_ROOT}.users',
     f'{APP_ROOT}.posts',
@@ -84,6 +91,8 @@ MIDDLEWARE = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_REDIRECT_URL = f'/{API_DOCS_NAME}'
 
 ROOT_URLCONF = 'api.config.urls'
 
@@ -115,6 +124,10 @@ DATABASES = {
         'NAME': get_path('db.sqlite3'),
     }
 }
+
+if DEPLOY_ON_HEROKU:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
 
 
 # Password validation
@@ -153,10 +166,33 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
+USE_S3_STORAGE = get_bool('USE_S3_STORAGE')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = get_path('media')
+AWS_ACCESS_KEY_ID = get_env('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = get_env('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = get_env('AWS_STORAGE_BUCKET_NAME', 'townvisor')
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+AWS_STATIC_LOCATION = 'static'
+STATICFILES_STORAGE = 'api.config.storage_backends.StaticStorage'
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, AWS_STATIC_LOCATION)
+
+AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
+DEFAULT_FILE_STORAGE = 'api.config.storage_backends.PublicMediaStorage'
+
+AWS_PRIVATE_MEDIA_LOCATION = 'media/private'
+PRIVATE_FILE_STORAGE = 'api.config.storage_backends.PrivateMediaStorage'
+
+AWS_DEFAULT_ACL = 'public-read'
+
+if not USE_S3_STORAGE:
+    STATIC_URL = '/static/'
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = get_path('media')
 
 
 # Application Logging
@@ -189,7 +225,7 @@ LOGGING = {
 # JWT Settings
 # http://getblimp.github.io/django-rest-framework-jwt/#additional-settings
 
-JWT_AUTH_EXPIRATION_MINUTES = 30 if DEBUG else int(os.getenv('JWT_AUTH_EXPIRATION_MINUTES' '5'))
+JWT_AUTH_EXPIRATION_MINUTES = get_int('JWT_AUTH_EXPIRATION_MINUTES', default=20)
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=JWT_AUTH_EXPIRATION_MINUTES * MINUTE),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
@@ -201,7 +237,7 @@ JWT_AUTH = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -211,9 +247,8 @@ REST_FRAMEWORK = {
         'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
     ),
     'DEFAULT_PARSER_CLASSES': (
-        'djangorestframework_camel_case.parser.CamelCaseFormParser',
-        'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
         'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+        # 'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
     ),
     'JSON_UNDERSCOREIZE': {
         'no_underscore_before_number': True,

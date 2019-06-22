@@ -1,6 +1,12 @@
 import os
 
+from dotenv import load_dotenv
+
+
 __all__ = ['get_env', 'get_path', 'get_bool', 'get_list', 'get_int']
+
+# Load from the .env file if present
+load_dotenv()
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -63,4 +69,9 @@ def get_list(name, separator=',', default=None):  # noqa
 
     if name not in os.environ:
         return default
-    return [x.strip() for x in os.environ[name].split(separator)]
+
+    value = os.environ[name]
+    if separator not in value:
+        return value.strip()
+
+    return [x.strip() for x in value.split(separator)]

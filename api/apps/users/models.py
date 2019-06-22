@@ -4,6 +4,8 @@ from django.contrib.auth.models import (
 )
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
+from api.config.storage_backends import PrivateMediaStorage
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
@@ -43,7 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         max_length=150,
         unique=True,
-        help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
+        primary_key=True,
+        help_text='Unique username to identify the user. Letters, digits and @/./+/-/_ only.',
         validators=[username_validator],
         error_messages={
             'unique': "A user with that username already exists.",
@@ -64,10 +67,23 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     date_of_birth = models.DateField(verbose_name='Date of Birth', help_text='In YYYY-MM-DD format')
 
-    about = models.TextField(default='I haven\'t filled my About section out yet!')
+    about = models.TextField(
+        default='I haven\'t filled my About section out yet!',
+        help_text='Profile description for the user',
+    )
 
-    avatar = models.ImageField(blank=True, null=True)
-    header = models.ImageField(blank=True, null=True)
+    avatar = models.ImageField(
+        storage=PrivateMediaStorage(),
+        blank=True,
+        null=True
+    )
+
+    header = models.ImageField(
+        storage=PrivateMediaStorage(),
+        help_text='The header image can be used as a backsplash for the user\'s profile.',
+        blank=True,
+        null=True
+    )
 
     # PERMISSIONS
 
