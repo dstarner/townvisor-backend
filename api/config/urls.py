@@ -28,7 +28,7 @@ def _build_includes(path):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
+    path(f'{settings.API_DOCS_NAME}/', include('rest_framework.urls')),
     path(f'{settings.API_DOCS_NAME}/', include_docs_urls(title='Townvisor API')),
     path('users/', _build_includes('users.urls')),
     path('posts/', _build_includes('posts.urls')),
