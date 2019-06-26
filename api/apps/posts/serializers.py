@@ -29,8 +29,8 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     author = UserSerializer()
-    header = serializers.ImageField(max_length=None, use_url=True)
-    thumbnail = serializers.ImageField(max_length=None, use_url=True)
+    header = serializers.ImageField(max_length=None, use_url=True, required=False,)
+    thumbnail = serializers.ImageField(max_length=None, use_url=True, required=False,)
 
     class Meta:
         model = Post
@@ -44,19 +44,23 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
             'header',
             'thumbnail',
             'abs_path',
+            'md_content',
         )
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
+        write_only_fields = (
+            'md_content',
+        )
         read_only_fields = (
-            'slug'
+            'slug',
         )
 
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     author = UserSerializer()
-    header = serializers.ImageField(max_length=None, use_url=True)
-    thumbnail = serializers.ImageField(max_length=None, use_url=True)
+    header = serializers.ImageField(max_length=None, use_url=True, required=False,)
+    thumbnail = serializers.ImageField(max_length=None, use_url=True, required=False,)
 
     class Meta:
         model = Post

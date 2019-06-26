@@ -9,7 +9,7 @@ class FeedView(generics.ListAPIView):
     serializer_class = serializers.PostSerializer
 
 
-class PostViewSet(viewsets.ReadOnlyModelViewSet):
+class PostViewSet(viewsets.ModelViewSet):
     queryset = models.Post.objects.all()
     lookup_field = 'slug'
 
@@ -31,6 +31,8 @@ class CommentViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         if 'post_slug' in self.kwargs:
             return self.queryset.filter(post__slug=self.kwargs['post_slug'])
+        if 'user_slug' in self.kwargs:
+            return self.queryset.filter(author__slug=self.kwargs['user_slug'])
         if 'parent_id' in self.kwargs:
             return self.queryset.filter(parent__id=self.kwargs['parent_id'])
         return self.queryset

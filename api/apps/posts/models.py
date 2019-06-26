@@ -16,8 +16,9 @@ class PostManager(models.Manager):
 class Post(models.Model):
 
     title = models.CharField(
-        default='',
-        max_length=128
+        blank=False,
+        null=False,
+        max_length=128,
     )
 
     author = models.ForeignKey(
