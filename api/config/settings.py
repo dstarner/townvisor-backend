@@ -129,7 +129,24 @@ DATABASES = {
 if DEPLOY_ON_HEROKU:
     DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
+# Caching
+# https://docs.djangoproject.com/en/2.2/topics/cache/#memcached
 
+MEMCACHIER = {
+    'URL': get_env('MEMCACHIER_SERVERS', ''),
+    'USER': get_env('MEMCACHIER_USERNAME', ''),
+    'PASSWORD': get_env('MEMCACHIER_PASSWORD', ''),
+}
+
+USING_CACHE = len(MEMCACHIER['URL']) > 0 and len(MEMCACHIER['USER']) > 0
+
+if USING_CACHE:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': MEMCACHIER['URL'],
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
