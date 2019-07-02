@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 
+from api.apps.generics.admin import LikesInline
 from .models import Post, Comment
 
 
@@ -45,6 +46,8 @@ class CommentAdminForm(forms.ModelForm):
 class CommentInline(admin.StackedInline):
 
     model = Comment
+    autocomplete_fields = ('author', )
+    exclude = ('parent',)
     extra = 0
 
 
@@ -52,20 +55,26 @@ class CommentAdmin(admin.ModelAdmin):
 
     form = CommentAdminForm
 
-    list_display = ('post_name', 'author', 'id', 'created', 'parent')
+    list_display = ('post_name', 'author', 'id', 'number_of_likes', 'number_of_flags', 'is_flagged', 'created', 'parent')
 
     search_fields = ('id', 'post__title', 'parent__post__title')
+
+    autocomplete_fields = ('author', 'parent', 'post')
+
+    inlines = (LikesInline,)
 
     readonly_fields = ('created',)
 
 
 class PostAdmin(admin.ModelAdmin):
 
-    list_display = ('title', 'slug', 'author', 'published', 'created', 'last_modified')
+    list_display = ('title', 'slug', 'author', 'published', 'number_of_likes', 'number_of_flags', 'is_flagged', 'created', 'last_modified')
 
-    list_filter = ('published', )
+    autocomplete_fields = ('author',)
 
-    inlines = (CommentInline,)
+    list_filter = ('published',)
+
+    inlines = (CommentInline, LikesInline)
 
     readonly_fields = ('slug',)
 

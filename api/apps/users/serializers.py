@@ -25,6 +25,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         required=True,
     )
 
+    user_has_flagged = serializers.SerializerMethodField()
+
+    def get_user_has_flagged(self, comment):
+        user = self.context['request'].user
+        return comment.flags.filter(creator=user).exists()
+
     class Meta:
         model = get_user_model()
         lookup_field = 'username'
@@ -42,6 +48,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
             'last_name',
             'full_name',
             'date_of_birth',
+            'user_has_flagged',
         )
         extra_kwargs = {
             'url': {'lookup_field': 'username'}

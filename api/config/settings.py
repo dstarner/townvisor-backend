@@ -34,7 +34,7 @@ APPEND_SLASH = True
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_bool('DEBUG', True)
 
-ALLOWED_HOSTS = get_list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = get_list('ALLOWED_HOSTS', separator=',', default=[])
 if not DEBUG and not ALLOWED_HOSTS:
     raise ValueError("ALLOWED_HOSTS cannot be empty when not in DEBUG")
 
@@ -53,7 +53,7 @@ if not DEBUG:
 
 # Cors Configuration
 CORS_ORIGIN_ALLOW_ALL = DEBUG
-CORS_ORIGIN_WHITELIST = get_list('CORS_ORIGIN_WHITELIST', ['http://localhost:8080', 'http://127.0.0.1:8080'])
+CORS_ORIGIN_WHITELIST = get_list('CORS_ORIGIN_WHITELIST', default=['http://localhost:8080', 'http://127.0.0.1:8080'])
 
 # Application definition
 APP_ROOT = 'api.apps'
@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'rest_framework',              # Provides all of the REST API functionality
     'storages',
 
+    f'{APP_ROOT}.generics',
     f'{APP_ROOT}.users',
     f'{APP_ROOT}.posts',
 ]

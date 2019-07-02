@@ -58,7 +58,7 @@ def get_bool(name, default=False):  # noqa
         return default
 
 
-def get_list(name, separator=',', default=None):  # noqa
+def get_list(name, default=None, separator=','):  # noqa
     """Get a list of string values from environment variable.
 
     If the environment variable is not set, the default value is returned

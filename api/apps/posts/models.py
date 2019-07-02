@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django_extensions.db.fields import (
     AutoSlugField, CreationDateTimeField, ModificationDateTimeField, RandomCharField
 )
 
+from api.apps.generics.models import Like, Flag
 from api.config.storage_backends import PrivateMediaStorage
 
 
@@ -59,6 +61,9 @@ class Post(models.Model):
         help_text='Markdown content for the blog post'
     )
 
+    likes = GenericRelation(Like, related_query_name='posts')
+    flags = GenericRelation(Flag, related_query_name='posts')
+
     objects = PostManager()
 
     def __str__(self):
@@ -67,9 +72,23 @@ class Post(models.Model):
     def abs_path(self):
         return f'{self.author.profile_url}/{self.slug}'
 
+    @property
+    def number_of_likes(self):
+        return self.likes.count()
+
+    @property
+    def number_of_flags(self):
+        return self.flags.count()
+
+    @property
+    def is_flagged(self):
+        return self.flags.count() > 0
+
     class Meta:
         db_table = 'posts'
         ordering = ['-created']
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
 
 
 class Comment(models.Model):
@@ -88,11 +107,16 @@ class Comment(models.Model):
 
     content = models.TextField(default='')
 
+    likes = GenericRelation(Like, related_query_name='comments')
+    flags = GenericRelation(Flag, related_query_name='comments')
+
     created = CreationDateTimeField(verbose_name='Creation Time')
 
     class Meta:
         db_table = 'comments'
         ordering = ['-created']
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
 
     def __str__(self):
         return f'Comment #{self.id}'
@@ -104,3 +128,15 @@ class Comment(models.Model):
         if self.post is not None:
             return self.post.title
         return self.parent.post_name
+
+    @property
+    def number_of_likes(self):
+        return self.likes.count()
+
+    @property
+    def number_of_flags(self):
+        return self.flags.count()
+
+    @property
+    def is_flagged(self):
+        return self.flags.count() > 0
