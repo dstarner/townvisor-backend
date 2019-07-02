@@ -191,6 +191,7 @@ AWS_DEFAULT_ACL = 'public-read'
 
 if not USE_S3_STORAGE:
     STATIC_URL = '/static/'
+    STATIC_ROOT = get_path('static')
     MEDIA_URL = '/media/'
     MEDIA_ROOT = get_path('media')
 

@@ -18,6 +18,8 @@ class CommentSerializer(serializers.ModelSerializer):
             'parent',
             'author',
             'replies',
+            'content',
+            'created',
         )
 
     def get_replies(self, comment):
@@ -59,8 +61,8 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 class PostDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     author = UserSerializer()
-    header = serializers.ImageField(max_length=None, use_url=True, required=False,)
-    thumbnail = serializers.ImageField(max_length=None, use_url=True, required=False,)
+    header = serializers.ImageField(max_length=None, use_url=True, required=False)
+    thumbnail = serializers.ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = Post

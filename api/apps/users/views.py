@@ -8,6 +8,7 @@ from . import models, serializers
 class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects.all()
     lookup_field = 'username'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     @action(
         detail=False,

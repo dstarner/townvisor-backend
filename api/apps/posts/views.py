@@ -1,10 +1,12 @@
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from . import models, serializers
 
 
 class FeedView(generics.ListAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = models.Post.objects.get_latest()
     serializer_class = serializers.PostSerializer
 
@@ -12,6 +14,8 @@ class FeedView(generics.ListAPIView):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = models.Post.objects.all()
     lookup_field = 'slug'
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         if 'user_username' in self.kwargs:
@@ -25,6 +29,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     queryset = models.Comment.objects.all()
     page_size = 10
 
